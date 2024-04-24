@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "935886107505",
+    "firebase_url": "https://ecommercegk-c93e2-default-rtdb.firebaseio.com",
+    "project_id": "ecommercegk-c93e2",
+    "storage_bucket": "ecommercegk-c93e2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935886107505:android:d06065fe4f06ba4b98fcd0",
+        "android_client_info": {
+          "package_name": "com.example.ecommercegk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOabEojCNhBmvLm6FPn_aRwkRvJrinkuY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
