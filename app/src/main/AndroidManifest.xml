@@ -33,6 +33,12 @@
         <activity
             android:name=".activity.MainActivity"
             android:exported="true" />
+        <activity
+            android:name=".activity.SignInActivity"
+            android:exported="true" />
+        <activity
+            android:name=".activity.SignUpActivity"
+            android:exported="true" />
     </application>
 
 </manifest>
