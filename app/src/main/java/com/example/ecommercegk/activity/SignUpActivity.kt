@@ -12,6 +12,7 @@ import com.example.ecommercegk.Model.UserData
 import com.example.ecommercegk.R
 import com.example.ecommercegk.databinding.ActivitySignUpBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
@@ -19,6 +20,7 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignUpBinding
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var firebaseRef: DatabaseReference
+    private lateinit var firebaseUser: FirebaseUser
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,9 +37,11 @@ class SignUpActivity : AppCompatActivity() {
             startActivity(intent)
         }
         binding.button.setOnClickListener {
+            val username = binding.userNameEt.text.toString()
             val email = binding.emailEt.text.toString()
             val pass = binding.passET.text.toString()
             val confirmPass = binding.confirmPassEt.text.toString()
+
 
             if (email.isNotEmpty() && pass.isNotEmpty() && confirmPass.isNotEmpty()) {
                 if (pass == confirmPass) {
@@ -46,7 +50,7 @@ class SignUpActivity : AppCompatActivity() {
                         if (it.isSuccessful) {
                             val intent = Intent(this, SignInActivity::class.java)
                             startActivity(intent)
-                            saveData(email)
+                            saveData(email,username)
                             Log.d("TAG", "Create account success !!")
                         } else {
                             Log.d("TAG", "Create account fail !!")
@@ -63,10 +67,13 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveData(email: String ) {
-        val userId = firebaseRef.push().key!!
-        val users = UserData(userId, email)
+    private fun saveData(email: String,userName: String ) {
+        firebaseUser = firebaseAuth.currentUser!!
+        val userId = firebaseUser.uid
+        val users = UserData(userId, email, userName)
+
         firebaseRef.child(userId).setValue(users)
+
             .addOnCompleteListener {
                 Log.d("TAG","Save data user success!!")
             }

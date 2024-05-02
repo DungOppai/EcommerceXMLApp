@@ -2,7 +2,10 @@ package com.example.ecommercegk.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,23 +16,51 @@ import com.example.ecommercegk.Adapter.BrandAdapter
 import com.example.ecommercegk.Adapter.PopularAdapter
 import com.example.ecommercegk.Adapter.SliderAdapter
 import com.example.ecommercegk.Model.SliderModel
+import com.example.ecommercegk.Model.UserData
+import com.example.ecommercegk.R
 import com.example.ecommercegk.ViewModel.MainViewModel
 import com.example.ecommercegk.databinding.ActivityMainBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import kotlin.math.log
 
 class MainActivity : BaseActivity() {
     private val viewModel = MainViewModel()
     private lateinit var binding: ActivityMainBinding
+    private lateinit var firebaseRef: DatabaseReference
+    private lateinit var firebaseUser: FirebaseUser
+    private lateinit var firebaseAuth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        firebaseRef = FirebaseDatabase.getInstance().getReference("Users")
+        // Get UID from signin
+        val userId = intent.getStringExtra("id")
+        if (userId != null) {
+            firebaseRef.child(userId).get().addOnSuccessListener {
+                if(it.exists()){
+                    val name = it.child("userName").value
+                    binding.textView5.text = name.toString()
+                }
+            }
+                .addOnFailureListener {
+                    Log.d("TAG","Error: ${it.message}")
+                }
+        }
 
         initBanner()
         initBrand()
         initPopular()
         initBottomMenu()
     }
+
 
     private fun initBottomMenu() {
         binding.cartBtn.setOnClickListener {
