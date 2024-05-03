@@ -70,10 +70,10 @@ class SignUpActivity : AppCompatActivity() {
     private fun saveData(email: String,userName: String ) {
         firebaseUser = firebaseAuth.currentUser!!
         val userId = firebaseUser.uid
-        val users = UserData(userId, email, userName)
+        val cartId = firebaseRef.push().key!!
+        val users = UserData(userId, email, userName, cartId)
 
         firebaseRef.child(userId).setValue(users)
-
             .addOnCompleteListener {
                 Log.d("TAG","Save data user success!!")
             }

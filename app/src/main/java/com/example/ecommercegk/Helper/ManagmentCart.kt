@@ -1,11 +1,20 @@
 package com.example.ecommercegk.Helper
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import com.example.ecommercegk.Model.ItemsModel
+import com.example.ecommercegk.Model.ItemsUserModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DatabaseReference
 
 
 class ManagementCart(val context: Context) {
+    private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var firebaseRef: DatabaseReference
+    private lateinit var firebaseUser: FirebaseUser
+
 
     private val tinyDB = TinyDB(context)
 
@@ -17,6 +26,7 @@ class ManagementCart(val context: Context) {
         if (existAlready) {
             listFood[index].numberInCart = item.numberInCart
         } else {
+
             listFood.add(item)
         }
         tinyDB.putListObject("CartList", listFood)
@@ -51,4 +61,6 @@ class ManagementCart(val context: Context) {
         }
         return fee
     }
+
+
 }

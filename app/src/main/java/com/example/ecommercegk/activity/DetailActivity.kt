@@ -13,6 +13,8 @@ import com.example.ecommercegk.Model.ItemsModel
 import com.example.ecommercegk.Model.SliderModel
 import com.example.ecommercegk.Model.UserData
 import com.example.ecommercegk.databinding.ActivityDetailBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
@@ -21,7 +23,9 @@ class DetailActivity : BaseActivity() {
     private lateinit var item: ItemsModel
     private var numberOder = 1
     private lateinit var managementCart: ManagementCart
+    private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var firebaseRef: DatabaseReference
+    private lateinit var firebaseUser: FirebaseUser
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +33,9 @@ class DetailActivity : BaseActivity() {
         setContentView(binding.root)
 
         managementCart = ManagementCart(this)
+
+        firebaseAuth = FirebaseAuth.getInstance()
+        firebaseRef = FirebaseDatabase.getInstance().getReference("Users")
 
         getBundle()
         banners()
@@ -83,7 +90,7 @@ class DetailActivity : BaseActivity() {
         binding.addToCartBtn.setOnClickListener {
             item.numberInCart = numberOder
             managementCart.insertFood(item)
-
+            createCart()
 
         }
         binding.backBtn.setOnClickListener { finish() }
@@ -92,6 +99,18 @@ class DetailActivity : BaseActivity() {
 
         }
     }
+    private fun createCart() {
+        firebaseUser = firebaseAuth.currentUser!!
+        val userId = firebaseUser.uid
+        firebaseRef.child("Users").child(userId).get().addOnSuccessListener {
+            val cartId = it.child("cartId").value
+            Log.i("firebase", "Got value cart ${cartId}")
+
+        }.addOnFailureListener{
+            Log.e("firebase", "Error getting data", it)
+        }
+    }
+
 
 
 }
