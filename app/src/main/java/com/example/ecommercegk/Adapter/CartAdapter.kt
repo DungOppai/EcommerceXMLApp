@@ -11,6 +11,8 @@ import com.example.ecommercegk.Helper.ChangeNumberItemsListener
 import com.example.ecommercegk.Helper.ManagementCart
 import com.example.ecommercegk.Model.ItemsModel
 import com.example.ecommercegk.databinding.ViewholderCartBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class CartAdapter(
     private val listItemSelected: ArrayList<ItemsModel>,
@@ -18,9 +20,9 @@ class CartAdapter(
     var changeNumberItemsListener: ChangeNumberItemsListener? = null
 
 ) : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
-    class ViewHolder(val binding: ViewholderCartBinding) : RecyclerView.ViewHolder(binding.root) {
-
-    }
+    private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var firebaseUser: FirebaseUser
+    class ViewHolder(val binding: ViewholderCartBinding) : RecyclerView.ViewHolder(binding.root)
 
     private val managementCart = ManagementCart(context)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartAdapter.ViewHolder {
@@ -29,8 +31,10 @@ class CartAdapter(
         return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: CartAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = listItemSelected[position]
+        firebaseAuth = FirebaseAuth.getInstance()
+        firebaseUser = firebaseAuth.currentUser!!
 
         holder.binding.titleTxt.text = item.title
         holder.binding.feeEachItem.text = "$${item.price}"
@@ -44,16 +48,18 @@ class CartAdapter(
             .into(holder.binding.pic)
 
         holder.binding.plusCartBtn.setOnClickListener {
-            managementCart.plusItem(listItemSelected, position, object : ChangeNumberItemsListener {
+            managementCart.plusItem(listItemSelected, position, object : ChangeNumberItemsListener{
                 override fun onChanged() {
                     notifyDataSetChanged()
                     changeNumberItemsListener?.onChanged()
                 }
 
-            })
+            },firebaseUser)
+
         }
         holder.binding.minusCartBtn.setOnClickListener {
             managementCart.minusItem(
+                firebaseUser,
                 listItemSelected,
                 position,
                 object : ChangeNumberItemsListener {
