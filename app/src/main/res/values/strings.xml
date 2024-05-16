@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">project176.3</string>
-    <string name="intro_title">Step into your <font color="#6033ba"> style\n A world of shoes</font></string>
-    <string name="intro_text">Browse the latest styles from top brands\nGet personalized recommendations\nEnjoy fast, free shipping</string>
+    <string name="intro_title">Welcome to Your  <font color="#6033ba"> \nUltimate Laptop Destination </font></string>
+    <string name="intro_text">Find Your Perfect Match Today!" 🎉💻\nGet personalized recommendations\nEnjoy fast, free shipping</string>
     <string name="intro_signin">Already have an account? <font color="#6033ba">Sign In</font></string>
     <string name="signin">Not have an account ? <font color="#6033ba">Sign Up</font></string>
     <string name="signup">Already have an account? <font color="#6033ba">Sign In</font></string>

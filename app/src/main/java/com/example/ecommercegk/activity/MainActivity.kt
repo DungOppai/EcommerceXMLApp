@@ -71,6 +71,14 @@ class MainActivity : BaseActivity() {
                 )
             )
         }
+        binding.profileBtn.setOnClickListener {
+            startActivity(
+                Intent(
+                    this@MainActivity,
+                    ProfileActivity::class.java
+                )
+            )
+        }
     }
 
     private fun initBanner() {

@@ -59,6 +59,9 @@ class SignInActivity : AppCompatActivity() {
 
                     }
                 }
+                    .addOnFailureListener {
+                        Log.d("TAG","error: ${it.message}")
+                    }
             } else {
                 Toast.makeText(this, "Empty Fields Are not Allowed !!", Toast.LENGTH_SHORT).show()
 

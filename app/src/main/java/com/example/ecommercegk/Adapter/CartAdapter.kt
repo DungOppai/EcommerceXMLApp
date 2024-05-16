@@ -1,6 +1,7 @@
 package com.example.ecommercegk.Adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -20,9 +21,10 @@ class CartAdapter(
     var changeNumberItemsListener: ChangeNumberItemsListener? = null
 
 ) : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
+
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var firebaseUser: FirebaseUser
-    class ViewHolder(val binding: ViewholderCartBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(val binding: ViewholderCartBinding) : RecyclerView.ViewHolder(binding.root){}
 
     private val managementCart = ManagementCart(context)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartAdapter.ViewHolder {
@@ -41,15 +43,23 @@ class CartAdapter(
         holder.binding.totalEachItem.text = "$${Math.round(item.numberInCart * item.price)}"
         holder.binding.numberItemTxt.text = item.numberInCart.toString()
 
-
+//        if (position < listItemSelected.size) {
+//            val item = listItemSelected[position]
+//            // Bind your data to the holder
+//        } else {
+//            // Handle the error, maybe log it or throw an exception
+//            Log.e("CartAdapter", "Invalid position: $position, Size: ${listItemSelected.size}")
+//        }
         Glide.with(holder.itemView.context)
             .load(item.picUrl[0])
             .apply(RequestOptions().transform(CenterCrop()))
             .into(holder.binding.pic)
 
         holder.binding.plusCartBtn.setOnClickListener {
+
             managementCart.plusItem(listItemSelected, position, object : ChangeNumberItemsListener{
                 override fun onChanged() {
+//                    updateCartItems(listItemSelected)
                     notifyDataSetChanged()
                     changeNumberItemsListener?.onChanged()
                 }
@@ -64,6 +74,7 @@ class CartAdapter(
                 position,
                 object : ChangeNumberItemsListener {
                     override fun onChanged() {
+//                        updateCartItems(listItemSelected)
                         notifyDataSetChanged()
                         changeNumberItemsListener?.onChanged()
                     }
@@ -73,4 +84,10 @@ class CartAdapter(
     }
 
     override fun getItemCount(): Int = listItemSelected.size
+    fun updateCartItems(newItems: List<ItemsModel>) {
+        listItemSelected.clear()
+        listItemSelected.addAll(newItems)
+        notifyDataSetChanged() // or use more specific notify methods like notifyItemInserted/Removed
+    }
+
 }
