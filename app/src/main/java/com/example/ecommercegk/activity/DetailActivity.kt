@@ -44,9 +44,9 @@ class DetailActivity : BaseActivity() {
 
     private fun initLists() {
         val sizeList = ArrayList<String>()
-        for (size in item.size) {
-            sizeList.add(size.toString())
-        }
+//        for (size in item.size) {
+//            sizeList.add(size.toString())
+//        }
 
         binding.sizeList.adapter = SizeAdapter(sizeList)
         binding.sizeList.layoutManager =
@@ -91,7 +91,6 @@ class DetailActivity : BaseActivity() {
             item.numberInCart = numberOder
             managementCart.insertFood(item)
             createCart()
-
 
         }
         binding.backBtn.setOnClickListener { finish() }

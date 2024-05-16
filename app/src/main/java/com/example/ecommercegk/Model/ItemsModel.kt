@@ -7,7 +7,7 @@ data class ItemsModel(
     var title: String = "",
     var description: String = "",
     var picUrl: ArrayList<String> = ArrayList(),
-    var size: ArrayList<String> = ArrayList(),
+//    var size: ArrayList<String> = ArrayList(),
     var price: Double = 0.0,
     var rating: Double = 0.0,
     var numberInCart: Int = 0
@@ -16,7 +16,7 @@ data class ItemsModel(
         parcel.readString().toString(),
         parcel.readString().toString(),
         parcel.createStringArrayList() as ArrayList<String>,
-        parcel.createStringArrayList() as ArrayList<String>,
+//        parcel.createStringArrayList() as ArrayList<String>,
         parcel.readDouble(),
         parcel.readDouble()
     )
@@ -29,7 +29,7 @@ data class ItemsModel(
     dest.writeString(title)
     dest.writeString(description)
     dest.writeStringList(picUrl)
-    dest.writeStringList(size)
+//    dest.writeStringList(size)
     dest.writeDouble(price)
     dest.writeDouble(rating)}
 

@@ -3,6 +3,9 @@ package com.example.ecommercegk.activity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ecommercegk.Adapter.CartAdapter
 import com.example.ecommercegk.Helper.ChangeNumberItemsListener
@@ -18,6 +21,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 class CartActivity : BaseActivity() {
+    private val _itemCart = MutableLiveData<MutableList<ItemsModel>>()
     private lateinit var firebaseRef: DatabaseReference
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var firebaseUser: FirebaseUser
@@ -29,33 +33,28 @@ class CartActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityCartBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        binding.viewCart.layoutManager = LinearLayoutManager(this)
-        binding.viewCart.setHasFixedSize(true)
-        cartList = arrayListOf<ItemsModel>()
-
         managementCart = ManagementCart(this)
+
+
         firebaseRef = FirebaseDatabase.getInstance().getReference("Users")
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseUser = firebaseAuth.currentUser!!
         val userId = firebaseUser.uid
 
-
-
-
         firebaseRef.child(userId).get().addOnSuccessListener {
             val cartId = it.child("cartId").value.toString()
             Log.d("TAG","get cartId in cartActivity $cartId success!!")
-            getItemData(cartId)
+            setVariable()
+            initCart(cartId)
+            calculateCart()
 
         }.addOnFailureListener{
             Log.e("firebase", "Error getting data", it)
         }
 
-
-        setVariable()
+//        setVariable()
 //        initCartList()
-        calculateCart()
+//        calculateCart()
     }
 
 
@@ -97,55 +96,78 @@ class CartActivity : BaseActivity() {
         binding.backBtn.setOnClickListener { finish() }
 
     }
+    private fun initCart(cartId: String) {
 
-    private fun getItemData(cartId: String) {
+
+//        val itemCart: LiveData<MutableList<ItemsModel>> = _itemCart
         binding.emptyTxt.visibility = View.VISIBLE
-        binding.viewCart.visibility = View.GONE
-        firebaseRef = FirebaseDatabase.getInstance().getReference("Cart")
-        firebaseRef.addValueEventListener(object: ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                cartList.clear()
-                if(snapshot.exists()){
-                    for (cartSnap in snapshot.children){
-                        val cartData = cartSnap.getValue(ItemsModel::class.java)
-                        cartList.add(cartData!!)
-                    }
-                    binding.viewCart.adapter = CartAdapter(cartList, context =this@CartActivity ,object : ChangeNumberItemsListener{
-                        override fun onChanged() {
-                            calculateCart()
-                        }
-                    })
-                    binding.emptyTxt.visibility = View.GONE
-                    binding.viewCart.visibility = View.VISIBLE
-                }else{
-                    Log.d("TAG","Snapshot doesn't exists")
+        _itemCart.observe(this, Observer {listItemSelected ->
+            binding.viewCart.layoutManager = LinearLayoutManager(this@CartActivity)
+            binding.viewCart.adapter = CartAdapter(ArrayList(listItemSelected), context = this ,object : ChangeNumberItemsListener {
+                override fun onChanged() {
+                    calculateCart()
                 }
+            })
 
+            binding.emptyTxt.visibility = if (listItemSelected.isEmpty()) View.VISIBLE else View.GONE
+        })
+        loadCart(cartId)
+
+    }
+    fun loadCart(cartId:String) {
+        firebaseRef = FirebaseDatabase.getInstance().getReference("Carts/${cartId}")
+        val ref = firebaseRef
+        ref.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val lists = ArrayList<ItemsModel>()
+
+                for (childSnapshot in snapshot.children) {
+                    val list = childSnapshot.getValue(ItemsModel::class.java)
+                    list?.let {
+                        lists.add(it)
+                        managementCart.insertFoodArray(it)
+                    }
+                }
+                _itemCart.value = lists
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.d("TAG","fail to fetch data")
+
             }
 
         })
     }
-//    fun getCartData(){
+
+//    private fun getItemData(cartId: String) {
+//        binding.emptyTxt.visibility = View.VISIBLE
+//        binding.viewCart.visibility = View.GONE
 //        firebaseRef = FirebaseDatabase.getInstance().getReference("Cart")
-//        firebaseRef.addValueEventListener(object : ValueEventListener {
-//            override fun onDataChange(snapshot: DataSnapshot){
+//        firebaseRef.addValueEventListener(object: ValueEventListener{
+//            override fun onDataChange(snapshot: DataSnapshot) {
 //                cartList.clear()
-//                if (snapshot.exists()){
-//                    for (i in snapshot.children){
-//                        val cartData = i.getValue(ItemsModel::class.java)
+//                if(snapshot.exists()){
+//                    for (cartSnap in snapshot.children){
+//                        val cartData = cartSnap.getValue(ItemsModel::class.java)
 //                        cartList.add(cartData!!)
 //                    }
-//                    val cartAdapter =
-//
+//                    binding.viewCart.adapter = CartAdapter(cartList, context =this@CartActivity ,object : ChangeNumberItemsListener{
+//                        override fun onChanged() {
+//                            calculateCart()
+//                        }
+//                    })
+//                    binding.emptyTxt.visibility = View.GONE
+//                    binding.viewCart.visibility = View.VISIBLE
+//                }else{
+//                    Log.d("TAG","Snapshot doesn't exists")
 //                }
+//
 //            }
+//
 //            override fun onCancelled(error: DatabaseError) {
-//                TODO("Not yet implemented")
+//                Log.d("TAG","fail to fetch data")
 //            }
+//
 //        })
 //    }
+
 }
