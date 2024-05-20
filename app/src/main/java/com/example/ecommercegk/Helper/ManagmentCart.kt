@@ -20,6 +20,7 @@ class ManagementCart(val context: Context) {
     private val tinyDB = TinyDB(context)
 
     fun insertFood(item: ItemsModel) {
+
         var listFood = getListCart()
         val existAlready = listFood.any { it.title == item.title }
         val index = listFood.indexOfFirst { it.title == item.title }
@@ -30,7 +31,9 @@ class ManagementCart(val context: Context) {
         } else {
 
             listFood.add(item)
+            createCart(listFood)
             Toast.makeText(context, "Added to your Cart", Toast.LENGTH_SHORT).show()
+
         }
         tinyDB.putListObject("CartList", listFood)
 
@@ -42,11 +45,9 @@ class ManagementCart(val context: Context) {
 
         if (existAlready) {
             listFood[index].numberInCart = item.numberInCart
-//            Toast.makeText(context,"This already in your cart",Toast.LENGTH_SHORT).show()
         } else {
 
             listFood.add(item)
-//            Toast.makeText(context, "Added to your Cart", Toast.LENGTH_SHORT).show()
         }
         tinyDB.putListObject("CartList", listFood)
 
@@ -69,7 +70,9 @@ class ManagementCart(val context: Context) {
         var indexItem = position
         if (listFood[position].numberInCart == 1) {
             listFood.removeAt(position)
+//            getCart(listFood[position].numberInCart,firebaseUser, indexItem)
             deleteCart(indexItem)
+            createCart(listFood)
 
         } else {
 
@@ -102,10 +105,11 @@ class ManagementCart(val context: Context) {
 
     private fun updateQuantity(cartId: String, numberInCart: Int, index: Int){
         firebaseRef = FirebaseDatabase.getInstance().getReference("Carts")
-        val cart = mapOf<String,Any>(
-            "numberInCart" to numberInCart
+        val cart = hashMapOf<String,Any>(
+            "$cartId/$index/numberInCart" to numberInCart
         )
-        firebaseRef.child(cartId).child(index.toString()).updateChildren(cart).addOnSuccessListener{
+
+        firebaseRef.updateChildren(cart).addOnSuccessListener{
             Log.d("TAG","update success cartID: $cartId quantity: $cart")
         }
     }
@@ -130,7 +134,7 @@ class ManagementCart(val context: Context) {
         firebaseRef.child(userId).get().addOnSuccessListener {
             val cartId = it.child("cartId").value.toString()
             Log.d("TAG","get cartId in deleteCart success!!")
-            firebaseRef = FirebaseDatabase.getInstance().getReference("Carts").child(cartId).child(index.toString())
+            firebaseRef = FirebaseDatabase.getInstance().getReference("Carts/$cartId/$index")
             val deleteItem = firebaseRef.removeValue()
             deleteItem
                 .addOnSuccessListener{
@@ -146,6 +150,32 @@ class ManagementCart(val context: Context) {
         }
 
 
+    }
+
+    private fun saveCart(cartId: String, listFood: ArrayList<ItemsModel>) {
+        firebaseRef = FirebaseDatabase.getInstance().getReference()
+        firebaseRef.child("Carts").child(cartId).setValue(listFood)
+            .addOnCompleteListener {
+                Log.d("TAG","Save data Cart success!!")
+            }
+            .addOnFailureListener {
+                Log.d("TAG","error: ${it.message}")
+            }
+    }
+
+    private fun createCart(listFood: ArrayList<ItemsModel>) {
+        firebaseAuth = FirebaseAuth.getInstance()
+        firebaseRef = FirebaseDatabase.getInstance().getReference("Users")
+        firebaseUser = firebaseAuth.currentUser!!
+        val userId = firebaseUser.uid
+        firebaseRef.child(userId).get().addOnSuccessListener {
+            val cartId = it.child("cartId").value.toString()
+            Log.d("TAG","create cartId success!!")
+            saveCart(cartId, listFood)
+
+        }.addOnFailureListener{
+            Log.e("firebase", "Error getting data", it)
+        }
     }
 
 

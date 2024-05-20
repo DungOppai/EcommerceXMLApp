@@ -59,4 +59,5 @@ dependencies {
     implementation("com.tbuonomo:dotsindicator:5.0")
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth)
+    implementation(libs.play.services.wallet)
 }

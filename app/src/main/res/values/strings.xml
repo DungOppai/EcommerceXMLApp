@@ -5,4 +5,5 @@
     <string name="intro_signin">Already have an account? <font color="#6033ba">Sign In</font></string>
     <string name="signin">Not have an account ? <font color="#6033ba">Sign Up</font></string>
     <string name="signup">Already have an account? <font color="#6033ba">Sign In</font></string>
+
 </resources>
