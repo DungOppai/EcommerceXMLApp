@@ -46,15 +46,13 @@ class CartActivity : BaseActivity() {
             Log.d("TAG","get cartId in cartActivity $cartId success!!")
             setVariable()
             initCart(cartId)
+//            initCartList()
             calculateCart()
 
         }.addOnFailureListener{
             Log.e("firebase", "Error getting data", it)
         }
 
-//        setVariable()
-//        initCartList()
-//        calculateCart()
     }
 
 
@@ -137,37 +135,5 @@ class CartActivity : BaseActivity() {
 
         })
     }
-
-//    private fun getItemData(cartId: String) {
-//        binding.emptyTxt.visibility = View.VISIBLE
-//        binding.viewCart.visibility = View.GONE
-//        firebaseRef = FirebaseDatabase.getInstance().getReference("Cart")
-//        firebaseRef.addValueEventListener(object: ValueEventListener{
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                cartList.clear()
-//                if(snapshot.exists()){
-//                    for (cartSnap in snapshot.children){
-//                        val cartData = cartSnap.getValue(ItemsModel::class.java)
-//                        cartList.add(cartData!!)
-//                    }
-//                    binding.viewCart.adapter = CartAdapter(cartList, context =this@CartActivity ,object : ChangeNumberItemsListener{
-//                        override fun onChanged() {
-//                            calculateCart()
-//                        }
-//                    })
-//                    binding.emptyTxt.visibility = View.GONE
-//                    binding.viewCart.visibility = View.VISIBLE
-//                }else{
-//                    Log.d("TAG","Snapshot doesn't exists")
-//                }
-//
-//            }
-//
-//            override fun onCancelled(error: DatabaseError) {
-//                Log.d("TAG","fail to fetch data")
-//            }
-//
-//        })
-//    }
 
 }

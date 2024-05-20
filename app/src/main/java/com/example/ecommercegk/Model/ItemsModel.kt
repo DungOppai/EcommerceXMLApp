@@ -10,7 +10,7 @@ data class ItemsModel(
 //    var size: ArrayList<String> = ArrayList(),
     var price: Double = 0.0,
     var rating: Double = 0.0,
-    var numberInCart: Int = 0
+    var numberInCart: Int = 0,
 ):Parcelable{
     constructor(parcel:Parcel):this(
         parcel.readString().toString(),
@@ -18,7 +18,8 @@ data class ItemsModel(
         parcel.createStringArrayList() as ArrayList<String>,
 //        parcel.createStringArrayList() as ArrayList<String>,
         parcel.readDouble(),
-        parcel.readDouble()
+        parcel.readDouble(),
+
     )
 
     override fun describeContents(): Int {
@@ -26,12 +27,13 @@ data class ItemsModel(
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
-    dest.writeString(title)
-    dest.writeString(description)
-    dest.writeStringList(picUrl)
-//    dest.writeStringList(size)
-    dest.writeDouble(price)
-    dest.writeDouble(rating)}
+        dest.writeString(title)
+        dest.writeString(description)
+        dest.writeStringList(picUrl)
+    //    dest.writeStringList(size)
+        dest.writeDouble(price)
+        dest.writeDouble(rating)
+    }
 
     companion object CREATOR : Parcelable.Creator<ItemsModel> {
         override fun createFromParcel(parcel: Parcel): ItemsModel {
