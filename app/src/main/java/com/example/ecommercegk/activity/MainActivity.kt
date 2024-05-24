@@ -20,8 +20,10 @@ import com.example.ecommercegk.Model.UserData
 import com.example.ecommercegk.R
 import com.example.ecommercegk.ViewModel.MainViewModel
 import com.example.ecommercegk.databinding.ActivityMainBinding
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -33,8 +35,6 @@ class MainActivity : BaseActivity() {
     private val viewModel = MainViewModel()
     private lateinit var binding: ActivityMainBinding
     private lateinit var firebaseRef: DatabaseReference
-    private lateinit var firebaseUser: FirebaseUser
-    private lateinit var firebaseAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,12 +72,13 @@ class MainActivity : BaseActivity() {
             )
         }
         binding.profileBtn.setOnClickListener {
-            startActivity(
-                Intent(
-                    this@MainActivity,
-                    ProfileActivity::class.java
-                )
-            )
+            val user = Firebase.auth.currentUser
+            val intent = Intent(this, ProfileActivity::class.java).apply {
+                if (user != null) {
+                    putExtra("id", user.uid)
+                }
+            }
+            startActivity(intent)
         }
     }
 
@@ -125,6 +126,6 @@ class MainActivity : BaseActivity() {
             binding.viewPopular.adapter = PopularAdapter(it)
             binding.progressBarPopular.visibility = View.GONE
         })
-        viewModel.loadPupolar()
+        viewModel.loadPopular()
     }
 }
