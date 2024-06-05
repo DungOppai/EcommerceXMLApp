@@ -3,15 +3,20 @@ package com.example.ecommercegk.activity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+
+import android.widget.ImageView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.GridLayoutManager
+
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ecommercegk.Adapter.CartAdapter
 import com.example.ecommercegk.Helper.ChangeNumberItemsListener
 import com.example.ecommercegk.Helper.ManagementCart
 import com.example.ecommercegk.Model.ItemsModel
+import com.example.ecommercegk.R
 import com.example.ecommercegk.databinding.ActivityCartBinding
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
@@ -25,7 +30,6 @@ class CartActivity : BaseActivity() {
     private lateinit var firebaseRef: DatabaseReference
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var firebaseUser: FirebaseUser
-    private lateinit var cartList : ArrayList<ItemsModel>
     private lateinit var binding: ActivityCartBinding
     private lateinit var managementCart: ManagementCart
     private var tax: Double = 0.0
@@ -52,11 +56,29 @@ class CartActivity : BaseActivity() {
         }.addOnFailureListener{
             Log.e("firebase", "Error getting data", it)
         }
+        // checkout
+//        val bottomSheet: View = findViewById(R.id.bottom_sheet)
+//        val bottomSheetBehavior: BottomSheetBehavior<*>?
+//        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+        binding.button.setOnClickListener {
+            showBottomSheet()
+
+        }
 
     }
 
 
-
+    fun showBottomSheet(){
+        val dialog = BottomSheetDialog(this)
+        val view = layoutInflater.inflate(R.layout.layout_bottom_sheet,null)
+        val btnClose = view.findViewById<ImageView>(R.id.backBtnCart)
+        btnClose.setOnClickListener{
+            dialog.dismiss()
+        }
+        dialog.setCancelable(false)
+        dialog.setContentView(view)
+        dialog.show()
+    }
     private fun initCartList() {
         binding.viewCart.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -94,10 +116,8 @@ class CartActivity : BaseActivity() {
         binding.backBtn.setOnClickListener { finish() }
 
     }
+
     private fun initCart(cartId: String) {
-
-
-//        val itemCart: LiveData<MutableList<ItemsModel>> = _itemCart
         binding.emptyTxt.visibility = View.VISIBLE
         _itemCart.observe(this, Observer {listItemSelected ->
             binding.viewCart.layoutManager = LinearLayoutManager(this@CartActivity)
@@ -135,5 +155,6 @@ class CartActivity : BaseActivity() {
 
         })
     }
+
 
 }
