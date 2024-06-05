@@ -1,10 +1,14 @@
 package com.example.ecommercegk.activity
 
+import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
 import android.util.Log
 import android.view.View
+import android.widget.EditText
 
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 
@@ -15,7 +19,6 @@ import com.example.ecommercegk.Helper.ManagementCart
 import com.example.ecommercegk.Model.ItemsModel
 import com.example.ecommercegk.R
 import com.example.ecommercegk.databinding.ActivityCartBinding
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -50,34 +53,69 @@ class CartActivity : BaseActivity() {
             Log.d("TAG","get cartId in cartActivity $cartId success!!")
             setVariable()
             initCart(cartId)
-//            initCartList()
-            calculateCart()
-
         }.addOnFailureListener{
             Log.e("firebase", "Error getting data", it)
         }
+        calculateCart()
         // checkout
-//        val bottomSheet: View = findViewById(R.id.bottom_sheet)
-//        val bottomSheetBehavior: BottomSheetBehavior<*>?
-//        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
         binding.button.setOnClickListener {
-            showBottomSheet()
+            showBottomSheet(userId)
 
         }
 
     }
 
 
-    fun showBottomSheet(){
+    fun showBottomSheet(userId: String){
         val dialog = BottomSheetDialog(this)
         val view = layoutInflater.inflate(R.layout.layout_bottom_sheet,null)
+
         val btnClose = view.findViewById<ImageView>(R.id.backBtnCart)
+        val totalOrder = view.findViewById<TextView>(R.id.total)
+        val contact = view.findViewById<TextView>(R.id.contact)
+        val ship = view.findViewById<TextView>(R.id.text_input)
+        val btnChangeContact = view.findViewById<TextView>(R.id.changeBtn1)
+        val btnChangeAddress = view.findViewById<TextView>(R.id.changeBtn2)
+        //caculator
+        val percentTax = 0.02
+        val delivery = 10.0
+        tax = Math.round((managementCart.getTotalFee() * percentTax) * 100) / 100.0
+        val total = Math.round((managementCart.getTotalFee() + tax + delivery) * 100) / 100
+        totalOrder.text = "$$total"
+        //close bottom_sheet
         btnClose.setOnClickListener{
             dialog.dismiss()
+        }
+        btnChangeAddress.setOnClickListener {
+            val intent = Intent(this, ProfileActivity::class.java)
+            intent.putExtra("id",userId)
+            startActivity(intent)
+
+        }
+        btnChangeContact.setOnClickListener {
+            val intent = Intent(this, ProfileActivity::class.java)
+            intent.putExtra("id",userId)
+            startActivity(intent)
         }
         dialog.setCancelable(false)
         dialog.setContentView(view)
         dialog.show()
+
+        // get contact user
+        firebaseRef = FirebaseDatabase.getInstance().getReference("Users")
+        firebaseRef.child(userId).get().addOnSuccessListener {
+            if (it.exists()) {
+                val email = it.child("email").value
+                contact.text = email.toString()
+                val address = it.child("address").value
+                ship.text = address.toString()
+            }
+            Log.d("TAG","get contact in bottom_sheet $contact success!!")
+
+        }.addOnFailureListener{
+            Log.e("firebase", "Error getting data", it)
+        }
+
     }
     private fun initCartList() {
         binding.viewCart.layoutManager =

@@ -15,6 +15,7 @@ import androidx.viewpager2.widget.MarginPageTransformer
 import com.example.ecommercegk.Adapter.BrandAdapter
 import com.example.ecommercegk.Adapter.PopularAdapter
 import com.example.ecommercegk.Adapter.SliderAdapter
+import com.example.ecommercegk.Helper.ManagementCart
 import com.example.ecommercegk.Model.SliderModel
 import com.example.ecommercegk.Model.UserData
 import com.example.ecommercegk.R
@@ -35,6 +36,7 @@ class MainActivity : BaseActivity() {
     private val viewModel = MainViewModel()
     private lateinit var binding: ActivityMainBinding
     private lateinit var firebaseRef: DatabaseReference
+    private lateinit var cartActivity: CartActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
