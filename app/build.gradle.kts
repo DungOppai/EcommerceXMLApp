@@ -39,6 +39,8 @@ android {
 }
 
 dependencies {
+    //Material design
+    implementation (libs.material)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
