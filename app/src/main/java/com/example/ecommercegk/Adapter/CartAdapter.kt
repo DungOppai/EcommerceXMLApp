@@ -52,7 +52,6 @@ class CartAdapter(
 
             managementCart.plusItem(listItemSelected, position, object : ChangeNumberItemsListener{
                 override fun onChanged() {
-//                    updateCartItems(listItemSelected)
                     notifyDataSetChanged()
                     changeNumberItemsListener?.onChanged()
                 }
@@ -67,7 +66,6 @@ class CartAdapter(
                 position,
                 object : ChangeNumberItemsListener {
                     override fun onChanged() {
-//                        updateCartItems(listItemSelected)
                         notifyDataSetChanged()
                         changeNumberItemsListener?.onChanged()
                     }

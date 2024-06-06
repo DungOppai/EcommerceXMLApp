@@ -90,7 +90,6 @@ class DetailActivity : BaseActivity() {
         binding.addToCartBtn.setOnClickListener {
             item.numberInCart = numberOder
             managementCart.insertFood(item)
-//            createCart()
 
         }
         binding.backBtn.setOnClickListener { finish() }
@@ -100,31 +99,6 @@ class DetailActivity : BaseActivity() {
 
         }
     }
-
-//    private fun saveCart(cartId: String) {
-//        firebaseRef = FirebaseDatabase.getInstance().getReference()
-//        firebaseRef.child("Cart").child(cartId).setValue(managementCart.getListCart())
-//            .addOnCompleteListener {
-//                Log.d("TAG","Save data Cart success!!")
-//            }
-//            .addOnFailureListener {
-//                Log.d("TAG","error: ${it.message}")
-//            }
-//    }
-//
-//    private fun createCart() {
-//        firebaseUser = firebaseAuth.currentUser!!
-//        val userId = firebaseUser.uid
-//        firebaseRef.child(userId).get().addOnSuccessListener {
-//            val cartId = it.child("cartId").value.toString()
-//            Log.d("TAG","create cartId success!!")
-//            saveCart(cartId)
-//
-//        }.addOnFailureListener{
-//            Log.e("firebase", "Error getting data", it)
-//        }
-//    }
-
 
 
 }

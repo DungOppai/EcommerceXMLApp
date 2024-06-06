@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.text.Editable
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 
@@ -42,50 +44,60 @@ class CartActivity : BaseActivity() {
         setContentView(binding.root)
         managementCart = ManagementCart(this)
 
-
+        // Firebase
         firebaseRef = FirebaseDatabase.getInstance().getReference("Users")
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseUser = firebaseAuth.currentUser!!
+
         val userId = firebaseUser.uid
 
+        // display carts
         firebaseRef.child(userId).get().addOnSuccessListener {
             val cartId = it.child("cartId").value.toString()
             Log.d("TAG","get cartId in cartActivity $cartId success!!")
             setVariable()
             initCart(cartId)
+            calculateCart()
         }.addOnFailureListener{
             Log.e("firebase", "Error getting data", it)
         }
-        calculateCart()
+
         // checkout
         binding.button.setOnClickListener {
             showBottomSheet(userId)
 
         }
 
+        calculateCart()
     }
 
 
-    fun showBottomSheet(userId: String){
+    private fun showBottomSheet(userId: String){
         val dialog = BottomSheetDialog(this)
         val view = layoutInflater.inflate(R.layout.layout_bottom_sheet,null)
 
+        val btnConfirm = view.findViewById<Button>(R.id.btn_confirm)
         val btnClose = view.findViewById<ImageView>(R.id.backBtnCart)
         val totalOrder = view.findViewById<TextView>(R.id.total)
         val contact = view.findViewById<TextView>(R.id.contact)
         val ship = view.findViewById<TextView>(R.id.text_input)
         val btnChangeContact = view.findViewById<TextView>(R.id.changeBtn1)
         val btnChangeAddress = view.findViewById<TextView>(R.id.changeBtn2)
-        //caculator
+        var cartId = ""
+
+        //calculator
         val percentTax = 0.02
         val delivery = 10.0
         tax = Math.round((managementCart.getTotalFee() * percentTax) * 100) / 100.0
         val total = Math.round((managementCart.getTotalFee() + tax + delivery) * 100) / 100
         totalOrder.text = "$$total"
+
         //close bottom_sheet
         btnClose.setOnClickListener{
             dialog.dismiss()
         }
+
+        // btn change information
         btnChangeAddress.setOnClickListener {
             val intent = Intent(this, ProfileActivity::class.java)
             intent.putExtra("id",userId)
@@ -97,18 +109,27 @@ class CartActivity : BaseActivity() {
             intent.putExtra("id",userId)
             startActivity(intent)
         }
+
+        // disable dialog
         dialog.setCancelable(false)
         dialog.setContentView(view)
         dialog.show()
 
-        // get contact user
+        // get info user
         firebaseRef = FirebaseDatabase.getInstance().getReference("Users")
         firebaseRef.child(userId).get().addOnSuccessListener {
             if (it.exists()) {
                 val email = it.child("email").value
                 contact.text = email.toString()
                 val address = it.child("address").value
-                ship.text = address.toString()
+                if(address == "null"){
+                    ship.text = "Go to profile to set your address"
+                }else{
+                    ship.text = address.toString()
+                }
+                val cart = it.child("cartId").value
+                cartId = cart.toString()
+
             }
             Log.d("TAG","get contact in bottom_sheet $contact success!!")
 
@@ -116,6 +137,40 @@ class CartActivity : BaseActivity() {
             Log.e("firebase", "Error getting data", it)
         }
 
+        // Payment
+        btnConfirm.setOnClickListener {
+            if(ship.text != "Go to profile to set your address"){
+                firebaseRef = FirebaseDatabase.getInstance().getReference("Carts/${cartId}")
+                firebaseRef.addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val lists = ArrayList<ItemsModel>()
+                        for (childSnapshot in snapshot.children) {
+                            val list = childSnapshot.getValue(ItemsModel::class.java)
+                            list?.let {
+                                lists.add(it)
+                            }
+                        }
+                        firebaseRef = FirebaseDatabase.getInstance().getReference("Orders")
+                        firebaseRef.child(userId).setValue(lists)
+                            .addOnCompleteListener {
+                                Log.d("PAYMENT","Save order payment success")
+//                            deleteCartWithPayment(cartId)
+                                dialog.dismiss()
+                            }
+                            .addOnFailureListener {
+                                Log.d("PAYMENT","Save order payment fail")
+                            }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        TODO("Not yet implemented")
+                    }
+                })
+            }else{
+                Toast.makeText(this,"Please fill your address before payment",Toast.LENGTH_SHORT).show()
+            }
+
+        }
     }
     private fun initCartList() {
         binding.viewCart.layoutManager =
@@ -152,7 +207,6 @@ class CartActivity : BaseActivity() {
 
     private fun setVariable() {
         binding.backBtn.setOnClickListener { finish() }
-
     }
 
     private fun initCart(cartId: String) {
@@ -164,19 +218,15 @@ class CartActivity : BaseActivity() {
                     calculateCart()
                 }
             })
-
             binding.emptyTxt.visibility = if (listItemSelected.isEmpty()) View.VISIBLE else View.GONE
         })
         loadCart(cartId)
-
     }
-    fun loadCart(cartId:String) {
+    private fun loadCart(cartId:String) {
         firebaseRef = FirebaseDatabase.getInstance().getReference("Carts/${cartId}")
-        val ref = firebaseRef
-        ref.addValueEventListener(object : ValueEventListener {
+        firebaseRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val lists = ArrayList<ItemsModel>()
-
                 for (childSnapshot in snapshot.children) {
                     val list = childSnapshot.getValue(ItemsModel::class.java)
                     list?.let {
@@ -188,10 +238,21 @@ class CartActivity : BaseActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-
+                TODO("Not yet implemented")
             }
-
         })
+    }
+    private fun deleteCartWhenPayment(cartId: String){
+        firebaseRef = FirebaseDatabase.getInstance().getReference("Carts")
+        firebaseRef.child(cartId).removeValue()
+            .addOnSuccessListener {
+                    Toast.makeText(this,"Payment successfully!!", Toast.LENGTH_SHORT).show()
+                    Log.d("Payment","delete item in cart id $cartId success!!")
+            }
+            .addOnFailureListener{
+                    Toast.makeText(this,"Payment fail!!", Toast.LENGTH_SHORT).show()
+                    Log.e("firebase", "Error delete item in cart id $cartId", it)
+            }
     }
 
 
