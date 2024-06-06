@@ -91,7 +91,7 @@
 
         <TextView
             android:id="@+id/userAddress"
-            android:layout_width="247dp"
+            android:layout_width="0dp"
             android:layout_height="25dp"
             android:layout_marginTop="8dp"
             android:text="Address"
@@ -142,7 +142,7 @@
 
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/editProfile"
+            android:id="@+id/editProfileBtn"
             style="@android:style/Widget.Button"
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -170,6 +170,13 @@
 
 
     </LinearLayout>
+
+    <include
+        android:id="@+id/change_profile_popup"
+        layout="@layout/change_profile_popup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

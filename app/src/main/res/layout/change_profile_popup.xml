@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="16dp">
+    xmlns:tools="http://schemas.android.com/tools"
+    app:cardElevation="10dp"
+    app:cardCornerRadius="16dp"
+    android:background="@android:color/transparent"
+    tools:context=".activity.ProfileActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="375dp"
@@ -38,7 +41,7 @@
             app:layout_constraintTop_toBottomOf="@+id/textView9">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/userNameEt"
+                android:id="@+id/changeName"
                 style="@style/LoginTextInputInnerFieldStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -61,7 +64,7 @@
             app:layout_constraintTop_toBottomOf="@+id/userNameLayout">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/emailEt"
+                android:id="@+id/changeEmail"
                 style="@style/LoginTextInputInnerFieldStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -85,7 +88,7 @@
             app:passwordToggleEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/passET"
+                android:id="@+id/changePassword"
                 style="@style/LoginTextInputInnerFieldStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -93,45 +96,68 @@
                 android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/addressLayout"
+            style="@style/LoginTextInputOuterFieldStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="24dp"
+            app:boxStrokeColor="@color/purple"
+            app:hintTextColor="@color/purple"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/passwordLayout">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/changeAddress"
+                style="@style/LoginTextInputInnerFieldStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Change Address"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/buttonLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/passwordLayout">
+            app:layout_constraintTop_toBottomOf="@+id/addressLayout">
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/editProfile"
+                android:id="@+id/backBtn"
                 style="@android:style/Widget.Button"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_margin="16dp"
                 android:layout_weight="1"
                 android:background="@drawable/purple_bg"
-                android:text="Edit Profile"
+                android:text="Back"
                 android:textColor="@color/white"
                 android:textSize="18sp"
-                app:layout_constraintEnd_toStartOf="@+id/logoutBtn"
+                app:layout_constraintEnd_toStartOf="@+id/confirmBtn"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/logoutBtn"
+                android:id="@+id/confirmBtn"
                 style="@android:style/Widget.Button"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
                 android:layout_margin="16dp"
                 android:layout_weight="1"
-                android:background="@drawable/red_bg"
-                android:text="Log Out"
+                android:background="@drawable/purple_bg"
+                android:text="Confirm"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/editProfile"
+                app:layout_constraintStart_toEndOf="@+id/backBtn"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
