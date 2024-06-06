@@ -139,37 +139,40 @@ class CartActivity : BaseActivity() {
 
         // Payment
         btnConfirm.setOnClickListener {
-            if(ship.text != "Go to profile to set your address"){
+            if (ship.text != "Go to profile to set your address") {
                 firebaseRef = FirebaseDatabase.getInstance().getReference("Carts/${cartId}")
-                firebaseRef.addValueEventListener(object : ValueEventListener {
+                firebaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        val lists = ArrayList<ItemsModel>()
+                        val lists = ArrayList<String>()
                         for (childSnapshot in snapshot.children) {
                             val list = childSnapshot.getValue(ItemsModel::class.java)
                             list?.let {
-                                lists.add(it)
+                                lists.add(it.title + " x" + it.numberInCart)
                             }
                         }
                         firebaseRef = FirebaseDatabase.getInstance().getReference("Orders")
-                        firebaseRef.child(userId).setValue(lists)
+                        val orderId = firebaseRef.push().key!!
+                        firebaseRef.child(userId).child(orderId).setValue(lists)
                             .addOnCompleteListener {
-                                Log.d("PAYMENT","Save order payment success")
-//                            deleteCartWithPayment(cartId)
+                                Log.d("PAYMENT", "Save order payment success")
+                                managementCart.clearCart()
+                                calculateCart()
+                                // Xóa cart khi thanh toán thành công
+                                deleteCartWhenPayment(cartId)
                                 dialog.dismiss()
                             }
                             .addOnFailureListener {
-                                Log.d("PAYMENT","Save order payment fail")
+                                Log.d("PAYMENT", "Save order payment fail")
                             }
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        TODO("Not yet implemented")
+                        Log.e("firebase", "Error fetching cart data", error.toException())
                     }
                 })
-            }else{
-                Toast.makeText(this,"Please fill your address before payment",Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Please fill your address before payment", Toast.LENGTH_SHORT).show()
             }
-
         }
     }
     private fun initCartList() {
@@ -242,16 +245,16 @@ class CartActivity : BaseActivity() {
             }
         })
     }
-    private fun deleteCartWhenPayment(cartId: String){
+    private fun deleteCartWhenPayment(cartId: String) {
         firebaseRef = FirebaseDatabase.getInstance().getReference("Carts")
         firebaseRef.child(cartId).removeValue()
             .addOnSuccessListener {
-                    Toast.makeText(this,"Payment successfully!!", Toast.LENGTH_SHORT).show()
-                    Log.d("Payment","delete item in cart id $cartId success!!")
+                Toast.makeText(this, "Payment successfully!!", Toast.LENGTH_SHORT).show()
+                Log.d("Payment", "delete item in cart id $cartId success!!")
             }
-            .addOnFailureListener{
-                    Toast.makeText(this,"Payment fail!!", Toast.LENGTH_SHORT).show()
-                    Log.e("firebase", "Error delete item in cart id $cartId", it)
+            .addOnFailureListener {
+                Toast.makeText(this, "Payment fail!!", Toast.LENGTH_SHORT).show()
+                Log.e("firebase", "Error delete item in cart id $cartId", it)
             }
     }
 
