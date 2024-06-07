@@ -15,9 +15,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.example.ecommercegk.Helper.ManagementCart
 import com.example.ecommercegk.Model.ItemsModel
+import com.example.ecommercegk.Model.UserData
 import com.example.ecommercegk.R
+import com.example.ecommercegk.ViewModel.MainViewModel
 import com.example.ecommercegk.databinding.ActivityCartBinding
 import com.example.ecommercegk.databinding.ActivityProfileBinding
 import com.github.dhaval2404.imagepicker.ImagePicker
@@ -39,6 +44,10 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var imageUri: Uri
     private lateinit var userImage: ImageView
     private lateinit var changeImg: FloatingActionButton
+    private val _userName = MutableLiveData<MutableList<UserData>>()
+    private val viewModel = MainViewModel()
+
+    val username: LiveData<MutableList<UserData>> = _userName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,18 +83,28 @@ class ProfileActivity : AppCompatActivity() {
         //Load UserInfo
         val userId = intent.getStringExtra("id")
         if (userId != null) {
-            firebaseRef.child(userId).get().addOnSuccessListener {
-                if (it.exists()) {
-                    val name = it.child("userName").value
-                    binding.userName.text = name.toString()
-                    val email = it.child("email").value
-                    binding.userEmail.text = email.toString()
-                    val address = it.child("address").value
-                    binding.userAddress.text = address.toString()
+            viewModel.username.observe(this, Observer { userDataList ->
+                // Update your UI with the user data
+                userDataList?.let {
+                    // For example, update a TextView with the user's name
+                    binding.userName.text =  it[0].userName ?: "No user name"
+                    binding.userEmail.text =  it[0].email ?: "No email"
+                    binding.userAddress.text =  it[0].address ?: "No address"
                 }
-            }.addOnFailureListener {
-                Log.d("TAG", "Error: ${it.message}")
-            }
+            })
+            viewModel.loadUser(userId)
+//            firebaseRef.child(userId).get().addOnSuccessListener {
+//                if (it.exists()) {
+//                    val name = it.child("userName").value
+//                    binding.userName.text = name.toString()
+//                    val email = it.child("email").value
+//                    binding.userEmail.text = email.toString()
+//                    val address = it.child("address").value
+//                    binding.userAddress.text = address.toString()
+//                }
+//            }.addOnFailureListener {
+//                Log.d("TAG", "Error: ${it.message}")
+//            }
         }
 
         userImage = findViewById(R.id.userImage)

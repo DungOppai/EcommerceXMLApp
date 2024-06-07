@@ -6,7 +6,10 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.Observer
+import androidx.activity.viewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +19,7 @@ import com.example.ecommercegk.Adapter.BrandAdapter
 import com.example.ecommercegk.Adapter.PopularAdapter
 import com.example.ecommercegk.Adapter.SliderAdapter
 import com.example.ecommercegk.Helper.ManagementCart
+import com.example.ecommercegk.Model.ItemsModel
 import com.example.ecommercegk.Model.SliderModel
 import com.example.ecommercegk.Model.UserData
 import com.example.ecommercegk.R
@@ -31,35 +35,43 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlin.math.log
+import androidx.lifecycle.Observer
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : BaseActivity() {
     private val viewModel = MainViewModel()
     private lateinit var binding: ActivityMainBinding
     private lateinit var firebaseRef: DatabaseReference
+    private lateinit var firebaseDatabase: FirebaseDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        firebaseDatabase = FirebaseDatabase.getInstance()
         firebaseRef = FirebaseDatabase.getInstance().getReference("Users")
         // Get UID from signin
         val userId = intent.getStringExtra("id")
         if (userId != null) {
-            firebaseRef.child(userId).get().addOnSuccessListener {
-                if(it.exists()){
-                    val name = it.child("userName").value
-                    binding.textView5.text = name.toString()
-                }
-            }
-                .addOnFailureListener {
-                    Log.d("TAG","Error: ${it.message}")
-                }
+            initUser(userId.toString())
         }
-
         initBanner()
         initBrand()
         initPopular()
         initBottomMenu()
+    }
+
+    //get user name
+    private fun initUser(userId: String){
+        viewModel.username.observe(this, Observer { userDataList ->
+            // Update your UI with the user data
+            userDataList?.let {
+                // For example, update a TextView with the user's name
+                binding.textView5.text =  it[0].userName ?: "No user name"
+            }
+        })
+        viewModel.loadUser(userId)
     }
 
 
