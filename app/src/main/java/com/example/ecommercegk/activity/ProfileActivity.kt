@@ -3,10 +3,12 @@ package com.example.ecommercegk.activity
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -18,10 +20,14 @@ import com.example.ecommercegk.Model.ItemsModel
 import com.example.ecommercegk.R
 import com.example.ecommercegk.databinding.ActivityCartBinding
 import com.example.ecommercegk.databinding.ActivityProfileBinding
+import com.github.dhaval2404.imagepicker.ImagePicker
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 
 class ProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileBinding
@@ -29,6 +35,10 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var firebaseRef: DatabaseReference
     private lateinit var editProfilePopup: Dialog
+    private lateinit var storageReference: StorageReference
+    private lateinit var imageUri: Uri
+    private lateinit var userImage: ImageView
+    private lateinit var changeImg: FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +50,8 @@ class ProfileActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+
         firebaseRef = FirebaseDatabase.getInstance().getReference("Users")
 
         managementCart = ManagementCart(this)
@@ -76,8 +88,34 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
 
+        userImage = findViewById(R.id.userImage)
+        changeImg = findViewById(R.id.floatingActionButton)
+
+        changeImg.setOnClickListener {
+            ImagePicker.with(this)
+                .crop()	    			//Crop image(Optional), Check Customization for more option
+                .compress(1024)			//Final image size will be less than 1 MB(Optional)
+                .maxResultSize(1080, 1080)	//Final image resolution will be less than 1080 x 1080(Optional)
+                .start()
+        }
+
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        userImage.setImageURI(data?.data)
+    }
+
+
+    private fun uploadProfileImage() {
+        imageUri = Uri.parse("")
+        storageReference = FirebaseStorage.getInstance().getReference("Users/" + firebaseAuth.currentUser?.uid)
+        storageReference.putFile(imageUri).addOnSuccessListener {
+            Toast.makeText(this@ProfileActivity, "Profile successfully updated", Toast.LENGTH_SHORT).show()
+        }.addOnFailureListener {
+            Toast.makeText(this@ProfileActivity, "Failed to upload the image", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     private fun showEditProfilePopup() {
         val nameEditText = editProfilePopup.findViewById<TextInputEditText>(R.id.changeName)
@@ -97,7 +135,7 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         saveButton.setOnClickListener {
-            // Save the updated profile information to the database
+
             updateUserProfile(
                 nameEditText.text.toString(),
                 emailEditText.text.toString(),
@@ -139,7 +177,7 @@ class ProfileActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
-        // Optionally, you can display a toast or message to inform the user that they have been logged out.
+
         Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show()
     }
 }
