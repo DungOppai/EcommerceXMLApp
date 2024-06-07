@@ -67,7 +67,7 @@
             android:layout_width="228dp"
             android:layout_height="36dp"
             android:layout_marginStart="72dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="71dp"
             android:text="Name"
             android:textAlignment="center"
@@ -80,7 +80,7 @@
         <TextView
             android:id="@+id/userEmail"
             android:layout_width="247dp"
-            android:layout_height="25dp"
+            android:layout_height="35dp"
             android:layout_marginTop="8dp"
             android:text="Email"
             android:textAlignment="center"
@@ -92,7 +92,7 @@
         <TextView
             android:id="@+id/userAddress"
             android:layout_width="0dp"
-            android:layout_height="25dp"
+            android:layout_height="35dp"
             android:layout_marginTop="8dp"
             android:text="Address"
             android:textAlignment="center"
@@ -172,7 +172,7 @@
     </LinearLayout>
 
     <include
-        android:id="@+id/change_profile_popup"
+        android:id="@+id/cprofile_popup"
         layout="@layout/change_profile_popup"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

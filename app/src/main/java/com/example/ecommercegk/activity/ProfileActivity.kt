@@ -28,8 +28,7 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var managementCart: ManagementCart
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var firebaseRef: DatabaseReference
-    private lateinit var changeProfilePopUp: View
-
+    private lateinit var editProfilePopup: Dialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +47,12 @@ class ProfileActivity : AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
 
 
-        changeProfilePopUp = findViewById(R.id.change_profile_popup)
+        editProfilePopup = Dialog(this)
+        editProfilePopup.setContentView(R.layout.change_profile_popup)
+
+        binding.editProfileBtn.setOnClickListener {
+            showEditProfilePopup()
+        }
 
 
         binding.logoutBtn.setOnClickListener {
@@ -74,18 +78,53 @@ class ProfileActivity : AppCompatActivity() {
 
     }
 
-    private fun changeProfile() {
-        val dialog = Dialog(this)
-        dialog.setContentView(R.layout.change_profile_popup)
 
-        val newUsername = dialog.findViewById<TextInputEditText>(R.id.changeName).text.toString()
-        val newEmail = dialog.findViewById<TextInputEditText>(R.id.changeEmail).text.toString()
-        val newPassword = dialog.findViewById<TextInputEditText>(R.id.changePassword).text.toString()
-        val newAddress = dialog.findViewById<TextInputEditText>(R.id.changeAddress).text.toString()
+    private fun showEditProfilePopup() {
+        val nameEditText = editProfilePopup.findViewById<TextInputEditText>(R.id.changeName)
+        val emailEditText = editProfilePopup.findViewById<TextInputEditText>(R.id.changeEmail)
+        val addressEditText = editProfilePopup.findViewById<TextInputEditText>(R.id.changeAddress)
 
+        // Populate the EditText fields with the current user data
+        nameEditText.setText(binding.userName.text.toString())
+        emailEditText.setText(binding.userEmail.text.toString())
+        addressEditText.setText(binding.userAddress.text.toString())
 
-        dialog.findViewById<AppCompatButton>(R.id.backBtn).setOnClickListener { dialog.dismiss() }
-        dialog.findViewById<AppCompatButton>(R.id.confirmBtn).setOnClickListener { dialog.dismiss() }
+        val cancelButton = editProfilePopup.findViewById<Button>(R.id.backBtn)
+        val saveButton = editProfilePopup.findViewById<Button>(R.id.confirmBtn)
+
+        cancelButton.setOnClickListener {
+            editProfilePopup.dismiss()
+        }
+
+        saveButton.setOnClickListener {
+            // Save the updated profile information to the database
+            updateUserProfile(
+                nameEditText.text.toString(),
+                emailEditText.text.toString(),
+                addressEditText.text.toString()
+            )
+            editProfilePopup.dismiss()
+        }
+
+        editProfilePopup.show()
+    }
+
+    private fun updateUserProfile(name: String, email: String, address: String) {
+        val userId = firebaseAuth.currentUser?.uid
+        if (userId != null) {
+            val userMap = mapOf(
+                "userName" to name,
+                "email" to email,
+                "address" to address
+            )
+            firebaseRef.child(userId).updateChildren(userMap)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Error updating profile: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
     }
 
     private fun setVariable() {
