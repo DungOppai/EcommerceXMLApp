@@ -29,7 +29,6 @@ class ManagementCart(val context: Context) {
             listFood[index].numberInCart = item.numberInCart
             Toast.makeText(context,"This already in your cart",Toast.LENGTH_SHORT).show()
         } else {
-
             listFood.add(item)
             createCart(listFood)
             Toast.makeText(context, "Added to your Cart", Toast.LENGTH_SHORT).show()
@@ -70,17 +69,12 @@ class ManagementCart(val context: Context) {
         var indexItem = position
         if (listFood[position].numberInCart == 1) {
             listFood.removeAt(position)
-//            getCart(listFood[position].numberInCart,firebaseUser, indexItem)
             deleteCart(indexItem)
             createCart(listFood)
-
         } else {
-
             listFood[position].numberInCart--
             Log.d("TAG","NumberInCart: ${listFood[position].numberInCart}")
             getCart(listFood[position].numberInCart,firebaseUser, indexItem)
-
-
         }
         tinyDB.putListObject("CartList", listFood)
         listener.onChanged()
@@ -177,8 +171,5 @@ class ManagementCart(val context: Context) {
             Log.e("firebase", "Error getting data", it)
         }
     }
-
-
-
 
 }

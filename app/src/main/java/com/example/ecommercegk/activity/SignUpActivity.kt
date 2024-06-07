@@ -71,7 +71,7 @@ class SignUpActivity : AppCompatActivity() {
         firebaseUser = firebaseAuth.currentUser!!
         val userId = firebaseUser.uid
         val cartId = firebaseRef.push().key!!
-        val users = UserData(userId, email, userName, cartId)
+        val users = UserData(userId, email, userName, cartId,"null")
 
         firebaseRef.child(userId).setValue(users)
             .addOnCompleteListener {
