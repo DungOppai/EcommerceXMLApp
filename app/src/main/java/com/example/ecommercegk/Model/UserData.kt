@@ -6,4 +6,5 @@ data class UserData(
     val userName: String? = null,
     val cartId: String ?= null,
     val address: String ?= null,
+    val uImage: String ?= null,
 )

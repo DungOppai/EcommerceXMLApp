@@ -55,10 +55,12 @@ dependencies {
 
     //ViewModel
     implementation("androidx.activity:activity-ktx:1.4.0")
-
+    implementation ("com.github.dhaval2404:imagepicker:2.1")
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     implementation ("com.google.code.gson:gson:2.9.1")
     implementation("com.tbuonomo:dotsindicator:5.0")
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-storage")
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth)
     implementation(libs.play.services.wallet)
