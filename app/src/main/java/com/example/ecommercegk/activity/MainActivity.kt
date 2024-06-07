@@ -81,6 +81,15 @@ class MainActivity : BaseActivity() {
             }
             startActivity(intent)
         }
+        binding.btnOrders.setOnClickListener{
+            val user = Firebase.auth.currentUser
+            val intent = Intent(this, OrderActivity::class.java).apply {
+                if (user != null) {
+                    putExtra("id", user.uid)
+                }
+            }
+            startActivity(intent)
+        }
     }
 
     private fun initBanner() {
