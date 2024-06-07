@@ -29,6 +29,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class CartActivity : BaseActivity() {
     private val _itemCart = MutableLiveData<MutableList<ItemsModel>>()
@@ -140,6 +144,8 @@ class CartActivity : BaseActivity() {
         // Payment
         btnConfirm.setOnClickListener {
             if (ship.text != "Go to profile to set your address") {
+                val currentDate = getCurrentDateTime()
+                val dateInString = currentDate.toString("yyyy-MM-dd HH:mm:ss")
                 firebaseRef = FirebaseDatabase.getInstance().getReference("Carts/${cartId}")
                 firebaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
@@ -150,9 +156,9 @@ class CartActivity : BaseActivity() {
                                 lists.add(it.title + " x" + it.numberInCart)
                             }
                         }
+                        lists.add(total.toString())
                         firebaseRef = FirebaseDatabase.getInstance().getReference("Orders")
-                        val orderId = firebaseRef.push().key!!
-                        firebaseRef.child(userId).child(orderId).setValue(lists)
+                        firebaseRef.child(userId).child(dateInString).setValue(lists)
                             .addOnCompleteListener {
                                 Log.d("PAYMENT", "Save order payment success")
                                 managementCart.clearCart()
@@ -258,5 +264,15 @@ class CartActivity : BaseActivity() {
             }
     }
 
+    // Hàm lấy ngày giờ hiện tại
+    private fun getCurrentDateTime(): Date {
+        return Calendar.getInstance().time
+    }
+
+    // Hàm mở rộng để định dạng Date thành String
+    private fun Date.toString(format: String, locale: Locale = Locale.getDefault()): String {
+        val formatter = SimpleDateFormat(format, locale)
+        return formatter.format(this)
+    }
 
 }
