@@ -19,6 +19,7 @@ import com.example.ecommercegk.Adapter.CartAdapter
 import com.example.ecommercegk.Helper.ChangeNumberItemsListener
 import com.example.ecommercegk.Helper.ManagementCart
 import com.example.ecommercegk.Model.ItemsModel
+import com.example.ecommercegk.Model.OrderData
 import com.example.ecommercegk.R
 import com.example.ecommercegk.databinding.ActivityCartBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -29,6 +30,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.gson.Gson
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -149,16 +151,21 @@ class CartActivity : BaseActivity() {
                 firebaseRef = FirebaseDatabase.getInstance().getReference("Carts/${cartId}")
                 firebaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        val lists = ArrayList<String>()
+                        val lists = ArrayList<ItemsModel>()
+                        val listCart = managementCart.getListCart()
+                        var quantity: Int = 0
+                        val orderId = firebaseRef.push().key!!
                         for (childSnapshot in snapshot.children) {
                             val list = childSnapshot.getValue(ItemsModel::class.java)
                             list?.let {
-                                lists.add(it.title + " x" + it.numberInCart)
+                                lists.add(it)
                             }
                         }
-                        lists.add(total.toString())
+
+//                        lists.add(quantity.toString())
+//                        lists.add(total.toString())
                         firebaseRef = FirebaseDatabase.getInstance().getReference("Orders")
-                        firebaseRef.child(userId).child(dateInString).setValue(lists)
+                        firebaseRef.child(userId).child(orderId).setValue(lists)
                             .addOnCompleteListener {
                                 Log.d("PAYMENT", "Save order payment success")
                                 managementCart.clearCart()
@@ -229,6 +236,7 @@ class CartActivity : BaseActivity() {
             })
             binding.emptyTxt.visibility = if (listItemSelected.isEmpty()) View.VISIBLE else View.GONE
         })
+        calculateCart()
         loadCart(cartId)
     }
     private fun loadCart(cartId:String) {
