@@ -64,4 +64,5 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth)
     implementation(libs.play.services.wallet)
+    implementation(libs.firebase.storage.ktx)
 }
