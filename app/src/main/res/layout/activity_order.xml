@@ -76,7 +76,8 @@
                     android:id="@+id/viewOrder"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="16dp" />
+                    android:layout_margin="16dp"
+                    tools:listitem="@layout/viewholder_order"/>
             </LinearLayout>
         </ScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -146,26 +146,29 @@ class CartActivity : BaseActivity() {
         // Payment
         btnConfirm.setOnClickListener {
             if (ship.text != "Go to profile to set your address") {
+                val email = contact.text.toString()
+                val address = ship.text.toString()
                 val currentDate = getCurrentDateTime()
+                var orderTitle= ""
+                var quantity = 0
                 val dateInString = currentDate.toString("yyyy-MM-dd HH:mm:ss")
                 firebaseRef = FirebaseDatabase.getInstance().getReference("Carts/${cartId}")
                 firebaseRef.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        val lists = ArrayList<ItemsModel>()
-                        val listCart = managementCart.getListCart()
-                        var quantity: Int = 0
-                        val orderId = firebaseRef.push().key!!
                         for (childSnapshot in snapshot.children) {
                             val list = childSnapshot.getValue(ItemsModel::class.java)
                             list?.let {
-                                lists.add(it)
+
+                                orderTitle += "${it.title} x${it.numberInCart}, "
+                                quantity +=it.numberInCart
+
+
                             }
                         }
+                        val order = OrderData(orderTitle,quantity,dateInString,total.toDouble(),address,email)
 
-//                        lists.add(quantity.toString())
-//                        lists.add(total.toString())
                         firebaseRef = FirebaseDatabase.getInstance().getReference("Orders")
-                        firebaseRef.child(userId).child(orderId).setValue(lists)
+                        firebaseRef.child(userId).push().setValue(order)
                             .addOnCompleteListener {
                                 Log.d("PAYMENT", "Save order payment success")
                                 managementCart.clearCart()
@@ -186,23 +189,6 @@ class CartActivity : BaseActivity() {
             } else {
                 Toast.makeText(this, "Please fill your address before payment", Toast.LENGTH_SHORT).show()
             }
-        }
-    }
-    private fun initCartList() {
-        binding.viewCart.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        binding.viewCart.adapter =
-            CartAdapter(managementCart.getListCart(), context = this ,object : ChangeNumberItemsListener {
-                override fun onChanged() {
-                    calculateCart()
-                }
-            })
-
-        with(binding) {
-            emptyTxt.visibility =
-                if (managementCart.getListCart().isEmpty()) View.VISIBLE else View.GONE
-            scrollView2.visibility =
-                if (managementCart.getListCart().isEmpty()) View.GONE else View.VISIBLE
         }
     }
 
