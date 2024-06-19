@@ -31,6 +31,7 @@ class PopularAdapter(val items: MutableList<ItemsModel>) :
         holder.binding.priceTxt.text = "$" + items[position].price.toString()
         holder.binding.ratingTxt.text = items[position].rating.toString()
 
+
         val requestOptions = RequestOptions().transform(CenterCrop())
         Glide.with(holder.itemView.context)
             .load(items[position].picUrl[0])

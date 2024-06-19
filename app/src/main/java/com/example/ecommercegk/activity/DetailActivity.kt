@@ -84,9 +84,12 @@ class DetailActivity : BaseActivity() {
         item = intent.getParcelableExtra("object")!!
 
         binding.titleTxt.text = item.title
+        binding.quantityTxt.text = "Remain: " +
+                "${item.quantity}"
         binding.descriptionTxt.text = item.description
         binding.priceTxt.text = "$" + item.price
         binding.ratingTxt.text = "${item.rating} Rating"
+
         binding.addToCartBtn.setOnClickListener {
             item.numberInCart = numberOder
             managementCart.insertFood(item)
