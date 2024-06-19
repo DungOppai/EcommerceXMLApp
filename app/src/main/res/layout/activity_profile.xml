@@ -140,19 +140,6 @@
 
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/viewOrder"
-            style="@android:style/Widget.Button"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_margin="8dp"
-
-            android:layout_weight="1"
-            android:background="@drawable/purple_bg"
-            android:text="View Order"
-            android:textColor="@color/white"
-            android:textSize="20sp" />
-
-        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/editProfileBtn"
             style="@android:style/Widget.Button"
             android:layout_width="match_parent"
